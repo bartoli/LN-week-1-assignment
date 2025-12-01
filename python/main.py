@@ -1,4 +1,6 @@
 from bitcoinrpc.authproxy import AuthServiceProxy, JSONRPCException
+from pyln.client import LightningRpc 
+import os
 
 def main():
 
@@ -17,28 +19,39 @@ def main():
         blockchain_info = client.getblockchaininfo()
         print("Blockchain Info:", blockchain_info)
 
-        # Create/Load the wallets, named 'Miner' and 'Trader'. Have logic to optionally create/load them if they do not exist or not loaded already.
+        rpc_path = os.path.join(os.path.expanduser("~"), ".lightning", "regtest", "lightning-rpc")
+        ln_client = LightningRpc(rpc_path)
+        ln_info = ln_client.getinfo()
+        print("Lightning Info:", ln_info)
 
-        # Generate spendable balances in the Miner wallet. How many blocks needs to be mined?
+        # Create a new address for funding using lightning-cli and store it in CLN_ADDRESS
 
-        # Load Trader wallet and generate a new address
+        # Create a bitcoin wallet named 'mining_wallet' using bitcoin-cli for mining
 
-        # Create parent transaction in the Miner wallet, sending 70 BTC to the Trader wallet address
-        # Remember to signal for RBF
+        # Generate a new address and mine blocks to it. How many blocks need to mined? Why?
 
-        # Sign and broadcast the transaction
+        # Fund the Lightning node by sending 0.1 BTC from the mining wallet to CLN_ADDRESS
 
-        # Output the parent transaction in the specified format to parent.json
+        # Confirm the funding transaction by mining 6 blocks
 
-        # Create and child transaction that spends the parent transaction output
+        # Verify Lightning wallet balance using lightning-cli listfunds
 
-        # Output the child transaction in the specified format to child.json
+        # Create an invoice with parameters and store the invoice string:
+        # - Amount: 50,000 satoshis (50000000 millisatoshis)
+        # - Label: Generate unique label using timestamp (e.g., "invoice_$(date +%s)")
+        # - Description: "Test Invoice"
+        # - Expiry: 3600 seconds
 
-        # Fee bump the Parent transaction using RBF. Do not use bitcoin-cli bumpfee
+        # Decode the invoice string using lightning-cli decodepay and verify the parameters
 
-        # Sign and broadcast the fee-bumped transaction
-
-        # Output the fee-bumped parent transaction in the specified format to parent-rbf.json
+        # Output the invoice details in the specified format to out.txt
+        # - Payment hash
+        # - BOLT11 invoice string
+        # - Amount
+        # - Description
+        # - Expiry time
+    except JSONRPCException as e:
+        print("An error occurred", e)
 
 if __name__ == "__main__":
     main()

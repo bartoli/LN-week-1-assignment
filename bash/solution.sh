@@ -4,26 +4,35 @@ blockchain_info=$(bitcoin-cli getblockchaininfo)
 # Print the blockchain info
 echo "$blockchain_info"
 
-# Create/Load the wallets, named 'Miner' and 'Trader'. Have logic to optionally create/load them if they do not exist or not loaded already.
+# Get node info using lightning-cli
+node_info=$(lightning-cli getinfo)
 
-# Generate spendable balances in the Miner wallet. How many blocks needs to be mined?
+# Print the node info
+echo "$node_info"
 
-# Load Trader wallet and generate a new address
+# Create a new address for funding using lightning-cli and store it in CLN_ADDRESS
 
-# Create parent transaction in the Miner wallet, sending 70 BTC to the Trader wallet address
-# Remember to signal for RBF
+# Create a bitcoin wallet named 'mining_wallet' using bitcoin-cli for mining
 
-# Sign and broadcast the transaction
+# Generate a new address and mine blocks to it. How many blocks need to mined? Why?
 
-# Output the parent transaction in the specified format to parent.json
+# Fund the Lightning node by sending 0.1 BTC from the mining wallet to CLN_ADDRESS
 
-# Create and child transaction that spends the parent transaction output
+# Confirm the funding transaction by mining 6 blocks
 
-# Output the child transaction in the specified format to child.json
+# Verify Lightning wallet balance using lightning-cli listfunds
 
-# Fee bump the Parent transaction using RBF. Do not use bitcoin-cli bumpfee
+# Create an invoice with parameters and store the invoice string:
+# - Amount: 50,000 satoshis (50000000 millisatoshis)
+# - Label: Generate unique label using timestamp (e.g., "invoice_$(date +%s)")
+# - Description: "Test Invoice"
+# - Expiry: 3600 seconds
 
-# Sign and broadcast the fee-bumped transaction
+# Decode the invoice string using lightning-cli decodepay and verify the parameters
 
-# Output the fee-bumped parent transaction in the specified format to parent-rbf.json
-
+# Output the invoice details in the specified format to out.txt
+# - Payment hash
+# - BOLT11 invoice string
+# - Amount
+# - Description
+# - Expiry time

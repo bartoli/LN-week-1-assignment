@@ -3,8 +3,8 @@ use bitcoincore_rpc::bitcoin::Amount;
 use bitcoincore_rpc::{Auth, Client, RpcApi};
 use serde::Deserialize;
 use serde_json::json;
-use std::fs::File;
-use std::io::Write;
+use std::{env, io::Write};
+use cln_rpc::{ClnRpc, model::requests::GetinfoRequest};
 
 // Node access params
 const RPC_URL: &str = "http://127.0.0.1:18443"; // Default regtest RPC port
@@ -33,7 +33,8 @@ fn send(rpc: &Client, addr: &str) -> bitcoincore_rpc::Result<String> {
     Ok(send_result.txid)
 }
 
-fn main() -> bitcoincore_rpc::Result<()> {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Connect to Bitcoin Core RPC
     let rpc = Client::new(
         RPC_URL,
@@ -42,30 +43,40 @@ fn main() -> bitcoincore_rpc::Result<()> {
 
     // Get blockchain info
     let blockchain_info = rpc.get_blockchain_info()?;
-    println!("Blockchain Info: {:?}", blockchain_info);
+    dbg!(&blockchain_info);
+    let sock = env::home_dir().unwrap().join(".lightning/regtest/lightning-rpc");
+    let mut client = ClnRpc::new(&sock).await?;
 
-    // Create/Load the wallets, named 'Miner' and 'Trader'. Have logic to optionally create/load them if they do not exist or not loaded already.
+    let request = GetinfoRequest {};
+    let getinfo_result = client.call_typed(&request).await?;
+    dbg!(&getinfo_result);
 
-    // Generate spendable balances in the Miner wallet. How many blocks needs to be mined?
+    // Create a new address for funding using lightning-cli and store it in CLN_ADDRESS
 
-    // Load Trader wallet and generate a new address
+    // Create a bitcoin wallet named 'mining_wallet' using bitcoin-cli for mining
 
-    // Create parent transaction in the Miner wallet, sending 70 BTC to the Trader wallet address
-    // Remember to signal for RBF
+    // Generate a new address and mine blocks to it. How many blocks need to mined? Why?
 
-    // Sign and broadcast the transaction
+    // Fund the Lightning node by sending 0.1 BTC from the mining wallet to CLN_ADDRESS
 
-    // Output the parent transaction in the specified format to parent.json
+    // Confirm the funding transaction by mining 6 blocks
 
-    // Create and child transaction that spends the parent transaction output
+    // Verify Lightning wallet balance using lightning-cli listfunds
 
-    // Output the child transaction in the specified format to child.json
+    // Create an invoice with parameters and store the invoice string:
+    // - Amount: 50,000 satoshis (50000000 millisatoshis)
+    // - Label: Generate unique label using timestamp (e.g., "invoice_$(date +%s)")
+    // - Description: "Coffee Payment"
+    // - Expiry: 3600 seconds
 
-    // Fee bump the Parent transaction using RBF. Do not use bitcoin-cli bumpfee
+    // Decode the invoice string using lightning-cli decodepay and verify the parameters
 
-    // Sign and broadcast the fee-bumped transaction
-
-    // Output the fee-bumped parent transaction in the specified format to parent-rbf.json
+    // Output the invoice details in the specified format to out.txt
+    // - Payment hash
+    // - BOLT11 invoice string
+    // - Amount in satoshis
+    // - Description
+    // - Expiry time
 
     Ok(())
 }

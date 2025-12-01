@@ -1,4 +1,7 @@
 const Client = require('bitcoin-core');
+const LightningClient = require('clightning-client');
+const os = require('os');
+const path = require('path');
 const fs = require('fs');
 
 const client = new Client({
@@ -8,35 +11,41 @@ const client = new Client({
     host: '127.0.0.1', // Host should not include the protocol
     port: 18443 // Ensure the correct port for regtest is used
 });
+const lightningclient = LightningClient(path.join(os.homedir(), '.lightning', 'regtest', 'lightning-rpc'));
 
 async function main() {
-    // Example: Get blockchain info
+    // Example: Get blockchain info and lightning node info
     const blockchainInfo = await client.getBlockchainInfo();
     console.log('Blockchain Info:', blockchainInfo);
+    const nodeInfo = await lightningclient.getinfo();
+    console.log('Node Info:', nodeInfo);
 
-    // Create/Load the wallets, named 'Miner' and 'Trader'. Have logic to optionally create/load them if they do not exist or not loaded already.
+    // Create a new address for funding using lightning-cli and store it in CLN_ADDRESS
 
-    // Generate spendable balances in the Miner wallet. How many blocks needs to be mined?
+    // Create a bitcoin wallet named 'mining_wallet' using bitcoin-cli for mining
 
-    // Load Trader wallet and generate a new address
+    // Generate a new address and mine blocks to it. How many blocks need to mined? Why?
 
-    // Create parent transaction in the Miner wallet, sending 70 BTC to the Trader wallet address
-    // Remember to signal for RBF
+    // Fund the Lightning node by sending 0.1 BTC from the mining wallet to CLN_ADDRESS
 
-    // Sign and broadcast the transaction
+    // Confirm the funding transaction by mining 6 blocks
 
-    // Output the parent transaction in the specified format to parent.json
+    // Verify Lightning wallet balance using lightning-cli listfunds
 
-    // Create and child transaction that spends the parent transaction output
+    // Create an invoice with parameters and store the invoice string:
+    // - Amount: 50,000 satoshis (50000000 millisatoshis)
+    // - Label: Generate unique label using timestamp (e.g., "invoice_$(date +%s)")
+    // - Description: "Coffee Payment"
+    // - Expiry: 3600 seconds
 
-    // Output the child transaction in the specified format to child.json
+    // Decode the invoice string using lightning-cli decodepay and verify the parameters
 
-    // Fee bump the Parent transaction using RBF. Do not use bitcoin-cli bumpfee
-
-    // Sign and broadcast the fee-bumped transaction
-
-    // Output the fee-bumped parent transaction in the specified format to parent-rbf.json
-
+    // Output the invoice details in the specified format to out.txt
+    // - Payment hash
+    // - BOLT11 invoice string
+    // - Amount in satoshis
+    // - Description
+    // - Expiry time
 }
 
 main().catch(err => {

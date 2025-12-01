@@ -25,6 +25,8 @@ set -e  # Exit immediately if any command fails
 # Start the setup script and give access to all runners
 chmod +x setup-bitcoin-node.sh
 /bin/bash setup-bitcoin-node.sh
+chmod +x setup-lightning.sh
+/bin/bash setup-lightning.sh
 
 chmod +x ./bash/run-bash.sh
 chmod +x ./python/run-python.sh
@@ -43,4 +45,12 @@ if pgrep -x "bitcoind" > /dev/null; then
   echo "bitcoind stopped."
 else
   echo "bitcoind is not running."
+fi
+# Stop the lightningd
+if pgrep -x "lightningd" > /dev/null; then
+  echo "Stopping lightningd..."
+  lightning-cli stop
+  echo "lightningd stopped."
+else
+  echo "lightningd is not running."
 fi

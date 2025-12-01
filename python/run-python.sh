@@ -11,6 +11,7 @@ source ./venv/bin/activate
 # Install required dependencies
 pip install --upgrade pip
 pip install python-bitcoinrpc
+pip install pyln-client
 
 # Run the Python script
 python3 ./python/main.py
