@@ -22,11 +22,7 @@ npm install # Install Node.js dependencies
 
 set -e  # Exit immediately if any command fails
 
-# Start the setup script and give access to all runners
-chmod +x setup-bitcoin-node.sh
-/bin/bash setup-bitcoin-node.sh
-chmod +x setup-lightning.sh
-/bin/bash setup-lightning.sh
+# Give access to all runners
 
 chmod +x ./bash/run-bash.sh
 chmod +x ./python/run-python.sh
@@ -34,23 +30,16 @@ chmod +x ./javascript/run-javascript.sh
 chmod +x ./rust/run-rust.sh
 chmod +x ./run.sh
 
+# Start docker
+docker compose up -d
+echo " Docker started."
+
+sleep 5
+
 # Run the test scripts
 /bin/bash run.sh
 npm run test
 
-# Stop the bitcoind
-if pgrep -x "bitcoind" > /dev/null; then
-  echo "Stopping bitcoind..."
-  pkill -x "bitcoind"
-  echo "bitcoind stopped."
-else
-  echo "bitcoind is not running."
-fi
-# Stop the lightningd
-if pgrep -x "lightningd" > /dev/null; then
-  echo "Stopping lightningd..."
-  lightning-cli stop
-  echo "lightningd stopped."
-else
-  echo "lightningd is not running."
-fi
+# Stop Docker services
+docker compose down -v
+echo "Docker services stopped."

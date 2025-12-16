@@ -5,3 +5,4 @@ install
 .DS_Store
 target/
 /venv
+__pycache__/

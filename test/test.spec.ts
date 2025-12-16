@@ -1,9 +1,12 @@
 import { readFileSync } from "fs";
+import { execSync } from "child_process";
 
-const LightningClient = require('clightning-client');
-const os = require('os');
-const path = require('path');
-const lightningclient = LightningClient(path.join(os.homedir(), '.lightning', 'regtest', 'lightning-rpc'));
+function lnCli(command: string): any {
+    const result = execSync(`docker exec ln-node lightning-cli --network=regtest ${command}`, {
+        encoding: 'utf-8'
+    });
+    return JSON.parse(result);
+}
 
 describe('Evaluate submission', () => {
     let paymentHash: string;
@@ -51,8 +54,8 @@ describe('Evaluate submission', () => {
         expect(expiry).toBe(3600);
     });
 
-    it('should verify invoice details via lightning-cli', async () => {
-        const decoded = await lightningclient.decodepay(bolt11);
+    it('should verify invoice details via lightning-cli', () => {
+        const decoded = lnCli(`decodepay ${bolt11}`);
 
         expect(decoded).toBeDefined();
         expect(decoded.payment_hash).toBe(paymentHash);
@@ -61,8 +64,8 @@ describe('Evaluate submission', () => {
         expect(decoded.expiry).toBe(3600);
     });
 
-    it('should have valid invoice in node', async () => {
-        const invoices = await lightningclient.listinvoices();
+    it('should have valid invoice in node', () => {
+        const invoices = lnCli('listinvoices');
 
         expect(invoices.invoices).toBeDefined();
         expect(invoices.invoices.length).toBeGreaterThan(0);
